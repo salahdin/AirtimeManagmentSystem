@@ -14,7 +14,7 @@ class Company(models.Model):
 class Employee(models.Model):
     name = models.CharField(max_length=255, verbose_name="employee name")
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="employee")
-    phone = models.PhoneNumberField()
+    phone = PhoneNumberField(unique=True)
     email = models.EmailField(blank=True, null=True)
 
 
