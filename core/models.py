@@ -34,3 +34,12 @@ class Wallet(models.Model):
         return f'{self.company} - {self.balance} Birr'
 
 
+class Payment(models.Model):
+    payment_to = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="employee")
+    payment_from = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="company")
+    amount = models.FloatField()
+    date = models.DateTimeField()
+
+    def __str__(self):
+        return f'{self.payment_from} - {self.payment_to} amount {self.amount}'
+
