@@ -10,6 +10,8 @@ class Company(models.Model):
     logo = models.ImageField(upload_to="element/", blank=True, null=True)
     created = models.DateField(auto_now_add=True)
 
+    def __str__(self):
+        return self.name
 
 class Employee(models.Model):
     name = models.CharField(max_length=255, verbose_name="employee name")
@@ -17,12 +19,18 @@ class Employee(models.Model):
     phone = PhoneNumberField(unique=True)
     email = models.EmailField(blank=True, null=True)
 
+    def __str__(self):
+        return self.name
+
 
 class Wallet(models.Model):
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE,
+    company = models.ForeignKey(Company, on_delete=models.CASCADE,
                                  related_name="wallet")
     is_open = models.BooleanField(default=False, verbose_name="is wallet open")
     balance = models.FloatField()
     last_update = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'{self.company} - {self.balance} Birr'
 
 
