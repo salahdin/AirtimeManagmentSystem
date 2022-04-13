@@ -13,6 +13,7 @@ class Company(models.Model):
     def __str__(self):
         return self.name
 
+
 class Employee(models.Model):
     name = models.CharField(max_length=255, verbose_name="employee name")
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="employee")
@@ -25,7 +26,7 @@ class Employee(models.Model):
 
 class Wallet(models.Model):
     company = models.ForeignKey(Company, on_delete=models.CASCADE,
-                                 related_name="wallet")
+                                related_name="wallet")
     is_open = models.BooleanField(default=False, verbose_name="is wallet open")
     balance = models.FloatField()
     last_update = models.DateTimeField(auto_now=True)
@@ -42,4 +43,3 @@ class Payment(models.Model):
 
     def __str__(self):
         return f'{self.payment_from} - {self.payment_to} amount {self.amount}'
-

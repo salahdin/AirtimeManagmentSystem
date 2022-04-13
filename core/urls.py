@@ -5,4 +5,5 @@ app_name = "core"
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('add/', views.register_employee, name='add_user')
 ]
