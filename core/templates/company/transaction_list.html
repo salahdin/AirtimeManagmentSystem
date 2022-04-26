@@ -1,0 +1,57 @@
+{% extends 'templates/base.html' %}
+
+{% block title %} Dashboard {% endblock title %}
+
+
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+<section>
+    <div class="page-header section-height-75">
+        <div class="container">
+            <div class="row">
+                <div class="card-body px-0 pb-2">
+                    <div class="table-responsive">
+                        <table class="table align-items-center mb-0">
+                            <thead>
+                            <tr>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">from</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">to</th>
+                                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">date</th>
+                                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">amount</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for transaction in transactions %}
+                                <tr>
+                                <td>
+                                    <div class="d-flex px-2 py-1">
+                                        <div class="d-flex flex-column justify-content-center">
+                                            <h6 class="mb-0 text-sm">{{transaction.payment_from}}</h6>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex px-2 py-1">
+                                        <div class="d-flex flex-column justify-content-center">
+                                            <h6 class="mb-0 text-sm">{{transaction.payment_to}}</h6>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="align-middle text-center text-sm">
+                                    <span class="text-xs font-weight-bold"> {{transaction.date}} </span>
+                                </td>
+                                <td class="align-middle text-center">
+                                    <h6><span class="badge bg-gradient-success text-xxs">{{transaction.amount}} Birr</span></h6>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content%}

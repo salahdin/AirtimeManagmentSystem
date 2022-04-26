@@ -36,10 +36,10 @@ class Wallet(models.Model):
 
 
 class Payment(models.Model):
-    payment_to = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="employee")
-    payment_from = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="company")
+    payment_to = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="payments")
+    payment_from = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="transactions")
     amount = models.FloatField()
     date = models.DateTimeField()
 
     def __str__(self):
-        return f'{self.payment_from} - {self.payment_to} amount {self.amount}'
+        return f'{self.payment_from} -> {self.payment_to} amount of {self.amount} Birr'

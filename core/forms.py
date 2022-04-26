@@ -31,3 +31,22 @@ class AddEmployeeForm(forms.Form):
     class Meta:
         model = Employee
         fields = ('name', 'phone', 'email',)
+
+
+class TopupForm(forms.Form):
+    amount = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": 'Amount',
+                "class": "form-control"
+            }
+        ))
+
+    phone = forms.IntegerField(
+        widget=forms.NumberInput(
+            attrs={
+                "placeholder": "Phone",
+                "class": "form-control"
+            }
+        ))
+
