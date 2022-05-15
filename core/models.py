@@ -6,6 +6,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 class Company(models.Model):
     name = models.CharField(max_length=255, verbose_name="company name")
+    tin_number = models.CharField(max_length=255, verbose_name="company tin number", null=True, blank=True)
     address = models.CharField(max_length=500, verbose_name="company address")
     logo = models.ImageField(upload_to="element/", blank=True, null=True)
     created = models.DateField(auto_now_add=True)
