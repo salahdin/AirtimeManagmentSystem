@@ -1,9 +1,11 @@
-from django.shortcuts import render, HttpResponseRedirect
+from django.shortcuts import render, HttpResponseRedirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .forms import AddEmployeeForm, TopupForm
+from .forms import AddEmployeeForm, TopupForm, BulkTopupForm
 from .models import Employee, Payment
 from django.conf import settings
 import requests
+from .notification import send_sms
+import datetime
 
 
 @login_required(login_url='/accounts/login/')
@@ -25,8 +27,18 @@ def index(request):
 
 
 """
-This function is used to 
+This function is used to add new employees
 """
+
+
+def employee_detail(request, employee_id):
+    employee = get_object_or_404(Employee, id=employee_id)
+    transactions = employee.payments.all()
+    context = {
+        'employee': employee,
+        'transactions': transactions
+    }
+    return render(request, 'company/employee_detail.html', context)
 
 
 def register_employee(request):
@@ -70,29 +82,89 @@ def billing(request):
     return render(request, "company/billing.html")
 
 
-def single_topup(request):
+def single_topup(request, employee_id):
     details = settings.SMS_API
-    print(details)
+    my_profile = request.user.profile.first()
+    my_company = my_profile.manages
     if request.method == "POST":
         form = TopupForm(request.POST)
         if form.is_valid():
             phone = request.POST['phone']
-
-            request_string = "*804#"
+            amount = request.POST['amount']
+            employee = get_object_or_404(Employee, id=employee_id)
+            print(employee.phone)
+            request_string = "*807*" + phone + '#'
+            print(request_string)
             url = details['server'] + "/services/send-ussd-request.php"
             args = {
                 'key': details['api_key'],
                 'request': request_string,
-                'device': '5028',
+                'device': '5178',
                 'sim': '1'
             }
             r = requests.get(url=url, params=args)
             data = r.json()
-            print(data)
+            # track transaction
+            Payment.objects.create(payment_to=employee,
+                                   payment_from=my_company,
+                                   amount=amount,
+                                   date=datetime.datetime.now())
     else:
         form = TopupForm()
-    return render(request, "company/topup.html", {"form": form,})
+    return render(request, "company/topup.html", {"form": form, })
 
 
 def bulk_topup(request):
-    pass
+    details = settings.SMS_API
+    my_profile = request.user.profile.first()
+    my_company = my_profile.manages
+    if request.method == "POST":
+        form = BulkTopupForm(request.POST, user=request.user)
+        if form.is_valid():
+            # get employees from form
+            employees = form.cleaned_data.get("employees")
+            amount = request.POST['amount']
+            # clean queryset
+            final_list = [employee for employee in employees if employee.phone.national_number]
+            url = details['server'] + "/services/send-ussd-request.php"
+            for employee in final_list:
+                request_string = "*807*" + employee.phone.national_number + "#"
+                args = {
+                    'key': details['api_key'],
+                    'request': request_string,
+                    'device': '5178',
+                    'sim': '2'
+                }
+
+                # send api request
+                r = requests.get(url=url, params=args)
+                # send notification sms
+                send_sms(employee.phone.national_number, amount, my_company.name, employee.name)
+                # track transaction
+                Payment.objects.create(payment_to=employee,
+                                       payment_from=my_company,
+                                       amount=amount,
+                                       date=datetime.datetime.now())
+    else:
+        form = BulkTopupForm(user=request.user)
+    return render(request, "company/bulk_topup.html", {"form": form})
+
+
+"""def bulk_topup(request):
+    details = settings.SMS_API
+    my_profile = request.user.profile.first()
+    my_company = my_profile.manages
+    employees = my_company.employee.all()
+    final_list = [employee for employee in employees if employee.phone.national_number]
+
+    for employee in final_list:
+        request_string = "*807*" + employee.phone.national_number + "#"
+        url = details['server'] + "/services/send-ussd-request.php"
+        args = {
+            'key': details['api_key'],
+            'request': request_string,
+            'device': '5178',
+        }
+        r = requests.get(url=url, params=args)
+        #send_sms(phone,amount,my_company.name, employee.name)
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))"""

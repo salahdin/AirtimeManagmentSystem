@@ -50,3 +50,24 @@ class TopupForm(forms.Form):
             }
         ))
 
+
+class BulkTopupForm(forms.Form):
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user')
+        my_profile = user.profile.first()
+        my_company = my_profile.manages
+        super(BulkTopupForm, self).__init__(*args, **kwargs)
+        self.fields['employees'].queryset = Employee.objects.filter(company=my_company)
+
+    amount = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": 'Amount',
+                "class": "form-control"
+            }
+        ))
+    employees = forms.ModelMultipleChoiceField(
+        queryset=None,
+        widget=forms.CheckboxSelectMultiple,
+    )
