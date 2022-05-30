@@ -13,5 +13,5 @@ urlpatterns = [
     path('employee/<int:employee_id>/', views.employee_detail, name="employee_detail"),
     path('generate_report/', views.generate_pdf_report, name="generate report"),
     path('delete/<int:id>/', views.delete_employee, name="delete_employee"),
-    path('bulk_register/', views.upload_employees,name="upload_employee")
+    path('bulk_register/', views.upload_employees, name="upload_employee_bulk")
 ]

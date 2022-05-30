@@ -25,25 +25,31 @@
 </head>
 <body class="g-sidenav-show bg-gray-100">
 
-  {% include "includes/sidebar.html" %}
+{% include "includes/sidebar.html" %}
 
-  <main class="main-content mt-4 border-radius-lg">
+<main class="main-content mt-4 border-radius-lg">
+
+  {% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+    <li>{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  {% block content %}{% endblock content %}
+
+</main>
+
+{% include "includes/fixed-plugin.html" %}
+
+{% include "includes/scripts.html" %}
+
+<!-- Specific JS goes HERE -->
+{% block javascripts %}{% endblock javascripts %}
 
 
-
-    {% block content %}{% endblock content %}
-
-  </main>
-
-  {% include "includes/fixed-plugin.html" %}
-
-  {% include "includes/scripts.html" %}
-
-  <!-- Specific JS goes HERE -->
-  {% block javascripts %}{% endblock javascripts %}
-
-
-  <script async defer src="https://buttons.github.io/buttons.js"></script>
+<script async defer src="https://buttons.github.io/buttons.js"></script>
 
 </body>
 </html>

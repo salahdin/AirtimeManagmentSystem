@@ -9,7 +9,7 @@ from django.http import FileResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter, A4
-
+from django.contrib import messages
 from reportlab.pdfgen import canvas
 from reportlab.platypus import Table, TableStyle
 from .forms import AddEmployeeForm, TopupForm, BulkTopupForm
@@ -272,11 +272,15 @@ def upload_employees(request):
         data_set = paramFile.read().decode('UTF-8')
         io_string = io.StringIO(data_set)
         next(io_string)
-        for column in csv.reader(io_string, delimiter=',', quotechar="|"):
-            _, created = Employee.objects.update_or_create(
-                name=column[0],
-                company=my_company,
-                phone=column[1],
-                email=column[2]
-            )
+        try:
+            for column in csv.reader(io_string, delimiter=',', quotechar="|"):
+                _, created = Employee.objects.update_or_create(
+                    name=column[0],
+                    company=my_company,
+                    phone=column[1],
+                    email=column[2]
+                )
+                messages.success(request, 'Employee Imported successfully')
+        except Exception:
+            messages.warning(request, 'Failed to create account')
     return render(request, "company/bulk_employee.html")
