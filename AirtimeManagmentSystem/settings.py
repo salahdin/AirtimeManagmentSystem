@@ -14,7 +14,7 @@ SECRET_KEY = 'django-insecure-(kp!6q$-bajqkiaad1p+&tao-6gz39%nuy&ew*q#ak8u&ahvke
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['airtime-management.herokuapp.com', '127.0.0.1:8000']
+ALLOWED_HOSTS = ['airtime-management.herokuapp.com', '127.0.0.1']
 
 # initialize environment variables
 
