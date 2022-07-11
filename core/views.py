@@ -3,7 +3,6 @@ import datetime
 import io
 
 import requests
-from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import FileResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
@@ -192,6 +191,7 @@ def bulk_topup(request):
                 r = requests.get(url=url, params=args)
                 # send notification sms
                 send_sms(employee.phone.national_number, amount, my_company.name, employee.name)
+                # deduct from balance
                 my_wallet.balance = my_wallet.balance - amount
                 my_wallet.save(update_fields=['balance'])
                 # track transaction
