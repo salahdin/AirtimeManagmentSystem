@@ -42,3 +42,10 @@ class Payment(models.Model):
 
     def __str__(self):
         return f'{self.payment_from} -> {self.payment_to} amount of {self.amount} Birr'
+
+
+class Config(models.Model):
+    api_key = models.CharField(max_length=255)
+    server = models.CharField(max_length=255)
+    sim = models.IntegerField()
+    device = models.IntegerField()

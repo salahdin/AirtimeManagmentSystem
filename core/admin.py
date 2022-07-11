@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Employee, Wallet, Company, Payment
+from .models import Employee, Wallet, Company, Payment, Config
 
 
 class EmployeeInline(admin.StackedInline):
@@ -20,3 +20,4 @@ admin.site.register(Employee)
 admin.site.register(Wallet)
 admin.site.register(Company,CompanyAdmin)
 admin.site.register(Payment)
+admin.site.register(Config)
