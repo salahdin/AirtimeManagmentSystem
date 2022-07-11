@@ -3,7 +3,6 @@ import datetime
 import io
 
 import requests
-from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import FileResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
@@ -13,7 +12,7 @@ from django.contrib import messages
 from reportlab.pdfgen import canvas
 from reportlab.platypus import Table, TableStyle
 from .forms import AddEmployeeForm, TopupForm, BulkTopupForm
-from .models import Employee, Payment
+from .models import Employee, Payment, Config
 from .notification import send_sms
 
 
@@ -108,9 +107,16 @@ def billing(request):
 def single_topup(request, employee_id):
     msg = None
     success = False
-    details = settings.SMS_API
-    my_profile = request.user.profile.first()
-    my_company = my_profile.manages
+    details = Config.objects.first()
+    if request.user.profile.first():
+        my_profile = request.user.profile.first()
+    else:
+        return render(request, "company/error.html", {"msg": "Not associated with any profile"})
+
+    if my_profile.manages:
+        my_company = my_profile.manages
+    else:
+        return render(request, "company/error.html", {"msg": "Not associated with any organization"})
     my_wallet = my_company.wallet.first()
     if request.method == "POST":
         form = TopupForm(request.POST)
@@ -122,18 +128,15 @@ def single_topup(request, employee_id):
                 return render(request, "company/topup.html", {"form": form, "msg": msg, "success": success})
 
             employee = get_object_or_404(Employee, id=employee_id)
-            print(my_wallet.balance)
             my_wallet.balance = my_wallet.balance - amount
             my_wallet.save(update_fields=['balance'])
-            print(my_wallet.balance)
             request_string = "*807*" + phone + '#'
-            print(request_string)
-            url = details['server'] + "/services/send-ussd-request.php"
+            url = details.server + "/services/send-ussd-request.php"
             args = {
-                'key': details['api_key'],
+                'key': details.api_key,
                 'request': request_string,
-                'device': '5178',
-                'sim': '1'
+                'device': details.device,
+                'sim': details.sim
             }
             # r = requests.get(url=url, params=args)
             # data = r.json()
@@ -151,31 +154,46 @@ def single_topup(request, employee_id):
 
 @login_required(login_url='/accounts/login/')
 def bulk_topup(request):
-    details = settings.SMS_API
-    my_profile = request.user.profile.first()
-    my_company = my_profile.manages
+    details = Config.objects.first()
+    success = False
+    if request.user.profile.first():
+        my_profile = request.user.profile.first()
+    else:
+        return render(request, "company/error.html", {"msg": "Not associated with any profile"})
+
+    if my_profile.manages:
+        my_company = my_profile.manages
+    else:
+        return render(request, "company/error.html", {"msg": "Not associated with any organization"})
+    my_wallet = my_company.wallet.first()
     if request.method == "POST":
         form = BulkTopupForm(request.POST, user=request.user)
         if form.is_valid():
             # get employees from form
             employees = form.cleaned_data.get("employees")
-            amount = request.POST['amount']
+            amount = float(request.POST['amount'])
+            if amount > my_wallet.balance:
+                msg = "You have insufficient balance for the these transaction "
+                return render(request, "company/bulk_topup.html", {"form": form, "msg": msg, "success": success})
+
             # clean queryset
             final_list = [employee for employee in employees if employee.phone.national_number]
-            url = details['server'] + "/services/send-ussd-request.php"
+            url = details.server + "/services/send-ussd-request.php"
             for employee in final_list:
                 request_string = "*807*" + employee.phone.national_number + "#"
                 args = {
-                    'key': details['api_key'],
+                    'key': details.api_key,
                     'request': request_string,
-                    'device': '5178',
-                    'sim': '2'
+                    'device': details.device,
+                    'sim': details.sim
                 }
-
                 # send api request
                 r = requests.get(url=url, params=args)
                 # send notification sms
                 send_sms(employee.phone.national_number, amount, my_company.name, employee.name)
+                # deduct from balance
+                my_wallet.balance = my_wallet.balance - amount
+                my_wallet.save(update_fields=['balance'])
                 # track transaction
                 Payment.objects.create(payment_to=employee,
                                        payment_from=my_company,
