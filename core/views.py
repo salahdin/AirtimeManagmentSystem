@@ -18,8 +18,15 @@ from .notification import send_sms
 
 @login_required(login_url='/accounts/login/')
 def index(request):
-    my_profile = request.user.profile.first()
-    my_company = my_profile.manages
+    if request.user.profile.first():
+        my_profile = request.user.profile.first()
+    else:
+        return render(request, "company/error.html", {"msg": "Not associated with any profile"})
+
+    if my_profile.manages:
+        my_company = my_profile.manages
+    else:
+        return render(request, "company/error.html", {"msg": "Not associated with any organization"})
     my_wallet = my_company.wallet.first()
     employees = my_company.employee.all()
     my_transactions = Payment.objects.filter(payment_from=my_company).order_by('-date')[:5][::-1]
