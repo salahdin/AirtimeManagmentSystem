@@ -21,7 +21,7 @@ def index(request):
     if request.user.profile.first():
         my_profile = request.user.profile.first()
     else:
-        return render(request, "company/error.html", {"msg": "Not associated with any profile"})
+        return render(request, "company/error.html", {"msg": "Your Account Is Not Associated With Any Profile"})
 
     if my_profile.manages:
         my_company = my_profile.manages
