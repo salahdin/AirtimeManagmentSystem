@@ -277,6 +277,9 @@
                 <td class="align-center">
                   <a href = "{% url 'core:employee_detail' employee.id %}"><span class="text-xs font-weight-bold">View</span></a>
                 </td>
+                <td class="align-center">
+                  <a href = "{% url 'core:single_topup' employee.id %}"><span class="text-xs font-weight-bold">Topup</span></a>
+                </td>
               </tr>
               {% endfor %}
               </tbody>

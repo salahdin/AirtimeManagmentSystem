@@ -128,7 +128,7 @@ def single_topup(request, employee_id):
     if request.method == "POST":
         form = TopupForm(request.POST)
         if form.is_valid():
-            phone = request.POST['phone']
+
             amount = float(request.POST['amount'])
             if amount > my_wallet.balance:
                 msg = "You have insufficient balance for the these transaction "
@@ -137,7 +137,8 @@ def single_topup(request, employee_id):
             employee = get_object_or_404(Employee, id=employee_id)
             my_wallet.balance = my_wallet.balance - amount
             my_wallet.save(update_fields=['balance'])
-            request_string = "*807*" + phone + '#'
+            request_string = "*806*" + str(employee.phone.national_number) + "*" + str(int(amount)) + '#'
+            print(request_string)
             url = details.server + "/services/send-ussd-request.php"
             args = {
                 'key': details.api_key,
@@ -145,11 +146,12 @@ def single_topup(request, employee_id):
                 'device': details.device,
                 'sim': details.sim
             }
-            # r = requests.get(url=url, params=args)
-            # data = r.json()
+            r = requests.get(url=url, params=args)
+            data = r.json()
             # track transaction
             msg = "transaction successful"
             success = True
+            send_sms(employee.phone.national_number, amount, my_company.name, employee.name)
             Payment.objects.create(payment_to=employee,
                                    payment_from=my_company,
                                    amount=amount,
@@ -187,7 +189,7 @@ def bulk_topup(request):
             final_list = [employee for employee in employees if employee.phone.national_number]
             url = details.server + "/services/send-ussd-request.php"
             for employee in final_list:
-                request_string = "*807*" + employee.phone.national_number + "#"
+                request_string = "*806*" + str(employee.phone.national_number) + "*" + str(int(amount)) + '#'
                 args = {
                     'key': details.api_key,
                     'request': request_string,
