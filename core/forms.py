@@ -42,13 +42,6 @@ class TopupForm(forms.Form):
             }
         ))
 
-    phone = forms.IntegerField(
-        widget=forms.NumberInput(
-            attrs={
-                "placeholder": "Phone",
-                "class": "form-control"
-            }
-        ))
 
 
 class BulkTopupForm(forms.Form):
