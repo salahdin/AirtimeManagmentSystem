@@ -6,3 +6,4 @@ urlpatterns = [
     path('',include('core.urls')),
     path('accounts/', include('accounts.urls')),
 ]
+admin.site.site_header = 'Airtime Management System'
