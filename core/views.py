@@ -1,6 +1,7 @@
 import csv
 import datetime
 import io
+import time
 
 import requests
 from django.contrib.auth.decorators import login_required
@@ -147,11 +148,18 @@ def single_topup(request, employee_id):
                 'sim': details.sim
             }
             r = requests.get(url=url, params=args)
+            args_1 = {
+                'key': details.api_key,
+                'request': "1",
+                'device': details.device,
+                'sim': details.sim
+            }
+            r = requests.get(url=url, params=args_1)
             data = r.json()
             # track transaction
             msg = "transaction successful"
             success = True
-            send_sms(employee.phone.national_number, amount, my_company.name, employee.name)
+            #send_sms(employee.phone.national_number, amount, my_company.name, employee.name)
             Payment.objects.create(payment_to=employee,
                                    payment_from=my_company,
                                    amount=amount,
