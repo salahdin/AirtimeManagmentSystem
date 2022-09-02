@@ -29,5 +29,5 @@ once loged in go to the admin panel http://127.0.0.1:8000/admin then edit the fi
 
 go to https://smsgateway.rbsoft.org/ and create an account then insert api key on your application.
 
-follow the insturctions on rbsoft websie.
+follow the insturctions on rbsoft website.
 
