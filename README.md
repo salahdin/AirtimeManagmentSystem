@@ -8,10 +8,10 @@
 - to install all dependencies run
   ```shell
    pip install requirments.txt
-  ``
+  ```
  to run the server run the following commands
  ```shell
- cd optss
+ cd AirtimeManagmentSystem
  python manage.py makemigrations
  python manage.py migrate
  python manage.py runserver
