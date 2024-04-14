@@ -1,6 +1,6 @@
 # Airtime Managment System
 ##   
--This application aimed to create a web-based platform for corporations to distribute airtime to employees through a USSD code, facilitated by an Android phone connected to RBSoft SMS Gateway.
+- This application aimed to create a web-based platform for corporations to distribute airtime to employees through a USSD code, facilitated by an Android phone connected to RBSoft SMS Gateway.
 
 ### installation
 - clone or download the repository
